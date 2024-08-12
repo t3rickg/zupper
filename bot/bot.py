@@ -7,23 +7,23 @@ from aiotg import Bot
 from database import db, text_search
 
 greeting = """
-    ✋ Welcome to Telegram Music Catalog! 🎧
-We are a community of music fans who are eager to share what we love.
-Just send your favourite tracks as audio files and they'll be available for everyone, on any device.
-To search through the catalog, just type artist name or track title. Nothing found? Feel free to fix it!
+    ✋ Ben Eko Müzik! 🎧
+Sevdiğimiz şeyleri paylaşmaya hevesli müzik hayranlarından oluşan bir topluluğuz.
+Favori parçalarınızı ses dosyası olarak göndermeniz yeterli; bu parçalar herhangi bir cihazda herkesin kullanımına sunulacak.
+Katalogda arama yapmak için sanatçı adını veya parça adını yazmanız yeterlidir. Hiçbir şey bulunamadı mı? Düzeltmekten çekinmeyin!
 """
 
 help = """
-To search through the catalog, just type artist name or track title.
-Inside a group chat you can use /music command, for example:
-/music Summer of Haze
+Katalogda arama yapmak için sanatçı adını veya parça adını yazmanız yeterlidir.
+Grup sohbetinde /music komutunu kullanabilirsiniz, örneğin:
+/music Helal all day
 
-By default, the search is fuzzy but you can use double quotes to filter results:
-"summer of haze"
-"sad family"
+Varsayılan olarak arama bulanıktır ancak sonuçları filtrelemek için çift tırnak kullanabilirsiniz:
+"bulanık yaz"
+"üzüntü aile"
 
-To make an even stricter search, just quote both terms:
-"aes dana" "haze"
+Daha da sıkı bir arama yapmak için her iki terimi de belirtmeniz yeterlidir:
+"aes dana" "sis"
 """
 
 not_found = """
@@ -46,7 +46,7 @@ async def add_track(chat, audio):
         return
 
     if "title" not in audio:
-        await chat.send_text("Sorry, but your track is missing title")
+        await chat.send_text("Üzgünüz ama parçanızın başlığı eksik")
         return
 
     doc = audio.copy()
@@ -64,7 +64,7 @@ def music(chat, match):
     return search_tracks(chat, match.group(1))
 
 
-@bot.command(r'\((\d+)/\d+\) show more for "(.+)"')
+@bot.command(r'\((\d+)/\d+\) daha fazlasını göster "(.+)"')
 def more(chat, match):
     page = int(match.group(1)) + 1
     return search_tracks(chat, match.group(2), page)
@@ -104,7 +104,7 @@ async def stop(chat, match):
     await db.users.remove({ "id": tuid })
 
     logger.info("%s quit", chat.sender)
-    await chat.send_text("Goodbye! We will miss you 😢")
+    await chat.send_text("Güle güle! Seni özleyeceğim 😢")
 
 
 @bot.command(r'/?help')
@@ -125,7 +125,7 @@ async def stats(chat, match):
     aggr = await cursor.to_list(1)
 
     if len(aggr) == 0:
-        return (await chat.send_text("Stats are not yet available"))
+        return (await chat.send_text("İstatistikler henüz mevcut değil"))
 
     size = human_size(aggr[0]["size"])
     text = '%d tracks, %s' % (count, size)
@@ -153,7 +153,7 @@ def send_track(chat, keyboard, track):
 
 
 async def search_tracks(chat, query, page=1):
-    logger.info("%s searching for %s", chat.sender, query)
+    logger.info("%s aranıyor %s", chat.sender, query)
 
     limit = 3
     offset = (page - 1) * limit
@@ -176,7 +176,7 @@ async def search_tracks(chat, query, page=1):
 
     if show_more:
         pages = math.ceil(count / limit)
-        kb = [['(%d/%d) Show more for "%s"' % (page, pages, query)]]
+        kb = [['(%d/%d) Daha fazlasını göster "%s"' % (page, pages, query)]]
         keyboard = {
             "keyboard": kb,
             "resize_keyboard": True
